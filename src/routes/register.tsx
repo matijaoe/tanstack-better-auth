@@ -63,9 +63,9 @@ function RegisterPage() {
                   autoComplete="off"
                   data-1p-ignore
                 />
-                {username.length > 0 && username.length < 3 && (
-                  <p className="text-muted-foreground text-xs">
-                    Username must be at least 3 characters
+                {usernameStatus === 'invalid' && (
+                  <p className="text-destructive-foreground text-xs">
+                    Min 2 characters. Letters, numbers, and underscores only.
                   </p>
                 )}
                 {usernameStatus === 'checking' && (

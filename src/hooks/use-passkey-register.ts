@@ -3,10 +3,11 @@ import { useNavigate } from '@tanstack/react-router'
 import { type FormEvent, useState } from 'react'
 
 import { authClient } from '#/lib/auth-client'
+import { usernameSchema } from '#/lib/validators'
 
 import { useDebouncedValue } from './use-debounced-value'
 
-type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'error'
+type UsernameStatus = 'idle' | 'invalid' | 'checking' | 'available' | 'taken' | 'error'
 
 export function usePasskeyRegister() {
   const navigate = useNavigate()
@@ -21,19 +22,16 @@ export function usePasskeyRegister() {
       })
       return result.data?.available ?? false
     },
-    enabled: debouncedUsername.length >= 3,
+    enabled: usernameSchema.safeParse(debouncedUsername).success,
   })
 
+  const isValid = usernameSchema.safeParse(username).success
+
   function getUsernameStatus(): UsernameStatus {
-    if (username.length < 3) {
-      return 'idle'
-    }
-    if (username !== debouncedUsername || availabilityQuery.isFetching) {
-      return 'checking'
-    }
-    if (availabilityQuery.isError) {
-      return 'error'
-    }
+    if (username.length === 0) return 'idle'
+    if (!isValid) return 'invalid'
+    if (username !== debouncedUsername || availabilityQuery.isFetching) return 'checking'
+    if (availabilityQuery.isError) return 'error'
     return availabilityQuery.data ? 'available' : 'taken'
   }
 

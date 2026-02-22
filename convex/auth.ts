@@ -29,7 +29,7 @@ export const createAuth = (ctx: Parameters<typeof convexAdapter>[0]) => {
         origin: process.env.SITE_URL ?? 'http://localhost:3000',
       }),
       username({
-        minUsernameLength: 3,
+        minUsernameLength: 2,
         maxUsernameLength: 30,
       }),
     ],
