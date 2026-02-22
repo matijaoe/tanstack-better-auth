@@ -2,7 +2,7 @@
 
 A demo app showcasing passwordless authentication with passkeys, built on a modern full-stack TypeScript setup.
 
-<img width="3010" height="1754" src="https://github.com/user-attachments/assets/ba0b0308-5ad5-422c-be90-2ae8a30103da" />
+<img width="3024" height="1768" src="https://github.com/user-attachments/assets/2cb8701d-d987-499f-8f16-427ffa46528c" />
 
 ## Stack
 
