@@ -5,17 +5,24 @@ Use Context7 MCP to get the latest documentation for the libraries.
 
 ## Code structure
 
-Separate behavior from UI. Extract business logic, async operations, and
-state management into the framework's behavior primitive (hooks). Components should render and call handlers — not
-contain API calls, async flows, cache invalidation, or error transformation.
+Separate behavior from presentation. Extract business logic, async
+operations, and state management into the framework's behavior primitive
+(React hooks). Components render
+and call handlers — they never contain API calls, async flows, cache
+invalidation, or error transformation.
 
-Expose only what the component needs: observable state and trigger
-functions. Keep implementation details internal.
+One behavior unit per feature or user action (e.g., useLogin,
+useRegister, usePasskeys) — not one monolithic unit per domain. Place
+them in a dedicated directory (`src/hooks/`).
+
+Expose only what the consumer needs: observable state and trigger
+functions. Keep implementation details, intermediate state, and retry
+logic internal.
 
 Use the data-fetching library's built-in state (loading, error, success)
-instead of manual flags. Model multi-value state as a discriminated type
-rather than independent booleans. Derive values from existing state
-instead of storing them separately.
+instead of manual boolean flags. Model multi-value state as a
+discriminated type rather than independent booleans. Derive computable
+values from existing state instead of storing them separately.
 
-UI-only state (which item is being edited, dialog open) stays in the
-component.
+Presentation-only state (which item is being edited, dialog open/closed,
+active tab) stays in the component.
