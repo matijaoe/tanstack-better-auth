@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { createFileRoute, redirect, Link } from '@tanstack/react-router'
 
 import { Button } from '#/components/ui/button'
@@ -25,6 +26,11 @@ export const Route = createFileRoute('/register')({
 function RegisterPage() {
   const { username, setUsername, usernameStatus, isPending, error, canSubmit, register } =
     usePasskeyRegister()
+  const submitRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (canSubmit) submitRef.current?.focus()
+  }, [canSubmit])
 
   return (
     <div className="flex justify-center py-8">
@@ -54,7 +60,8 @@ function RegisterPage() {
                   value={username}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
                   disabled={isPending}
-                  autoComplete="username"
+                  autoComplete="off"
+                  data-1p-ignore
                 />
                 {username.length > 0 && username.length < 3 && (
                   <p className="text-muted-foreground text-xs">
@@ -76,7 +83,7 @@ function RegisterPage() {
                   </p>
                 )}
               </div>
-              <Button type="submit" disabled={!canSubmit} className="w-full" size="lg">
+              <Button ref={submitRef} type="submit" disabled={!canSubmit} className="w-full" size="lg">
                 {isPending ? 'Setting up...' : 'Register with passkey'}
               </Button>
             </CardContent>
