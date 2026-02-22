@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react'
 import { createFileRoute, redirect, Link } from '@tanstack/react-router'
+import { useEffect, useRef } from 'react'
 
 import { Button } from '#/components/ui/button'
 import {
@@ -83,7 +83,13 @@ function RegisterPage() {
                   </p>
                 )}
               </div>
-              <Button ref={submitRef} type="submit" disabled={!canSubmit} className="w-full" size="lg">
+              <Button
+                ref={submitRef}
+                type="submit"
+                disabled={!canSubmit}
+                className="w-full"
+                size="lg"
+              >
                 {isPending ? 'Setting up...' : 'Register with passkey'}
               </Button>
             </CardContent>

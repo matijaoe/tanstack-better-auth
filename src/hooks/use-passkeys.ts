@@ -19,8 +19,7 @@ export function usePasskeys() {
     },
   })
 
-  const invalidatePasskeys = () =>
-    queryClient.invalidateQueries({ queryKey: ['passkeys'] })
+  const invalidatePasskeys = () => queryClient.invalidateQueries({ queryKey: ['passkeys'] })
 
   const addMutation = useMutation({
     mutationFn: () => authClient.passkey.addPasskey({ name: 'New passkey' }),
@@ -28,9 +27,13 @@ export function usePasskeys() {
   })
 
   const renameMutation = useMutation({
-    mutationFn: ({ id, name }: { id: string; name: string }) => {
-      if (!name.trim()) return Promise.resolve()
-      return authClient.passkey.updatePasskey({ id, name: name.trim() })
+    mutationFn: async ({ id, name }: { id: string; name: string }) => {
+      if (!name.trim()) return
+      const result = await authClient.passkey.updatePasskey({
+        id,
+        name: name.trim(),
+      })
+      if (result.error) throw result.error
     },
     onSuccess: invalidatePasskeys,
   })

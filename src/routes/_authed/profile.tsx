@@ -34,7 +34,7 @@ function ProfilePage() {
   return (
     <div className="space-y-6">
       <div className="border-border border-b pb-4">
-        <h1 className="font-mono text-xs font-semibold tracking-widest uppercase text-muted-foreground">
+        <h1 className="text-muted-foreground font-mono text-xs font-semibold tracking-widest uppercase">
           Profile
         </h1>
       </div>
