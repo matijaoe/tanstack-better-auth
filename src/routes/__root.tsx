@@ -1,6 +1,6 @@
 import { ConvexBetterAuthProvider } from '@convex-dev/better-auth/react'
 import type { ConvexQueryClient } from '@convex-dev/react-query'
-import type { QueryClient } from '@tanstack/react-query'
+import { QueryClientProvider, type QueryClient } from '@tanstack/react-query'
 import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 
@@ -55,25 +55,27 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
-  const { token, convexQueryClient } = Route.useRouteContext()
+  const { token, queryClient, convexQueryClient } = Route.useRouteContext()
   return (
-    <ConvexBetterAuthProvider
-      client={convexQueryClient.convexClient}
-      authClient={authClient}
-      initialToken={token}
-    >
-      <div className="page-grid-bg text-foreground min-h-screen">
-        <Navbar />
-        <main className="container mx-auto max-w-2xl px-4 py-12">
-          <div className="crosshair-container">
-            <span className="corner-marker corner-marker--tl" aria-hidden="true" />
-            <span className="corner-marker corner-marker--tr" aria-hidden="true" />
-            <span className="corner-marker corner-marker--bl" aria-hidden="true" />
-            <span className="corner-marker corner-marker--br" aria-hidden="true" />
-            <Outlet />
-          </div>
-        </main>
-      </div>
-    </ConvexBetterAuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <ConvexBetterAuthProvider
+        client={convexQueryClient.convexClient}
+        authClient={authClient}
+        initialToken={token}
+      >
+        <div className="page-grid-bg text-foreground min-h-screen">
+          <Navbar />
+          <main className="container mx-auto max-w-2xl px-4 py-12">
+            <div className="crosshair-container">
+              <span className="corner-marker corner-marker--tl" aria-hidden="true" />
+              <span className="corner-marker corner-marker--tr" aria-hidden="true" />
+              <span className="corner-marker corner-marker--bl" aria-hidden="true" />
+              <span className="corner-marker corner-marker--br" aria-hidden="true" />
+              <Outlet />
+            </div>
+          </main>
+        </div>
+      </ConvexBetterAuthProvider>
+    </QueryClientProvider>
   )
 }

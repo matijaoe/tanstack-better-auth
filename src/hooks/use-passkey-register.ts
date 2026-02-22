@@ -39,7 +39,7 @@ export function usePasskeyRegister() {
 
   const usernameStatus = getUsernameStatus()
 
-  const registerMutation = useMutation({
+  const { mutate, isPending, error } = useMutation({
     mutationFn: async () => {
       // TODO: not great. use actual email + password in the future, or wait for passkey supported not requiring these fields
       const email = `${username}@passkey.internal`
@@ -68,19 +68,19 @@ export function usePasskeyRegister() {
     onSuccess: () => navigate({ to: '/profile' }),
   })
 
-  const canSubmit = usernameStatus === 'available' && !registerMutation.isPending
+  const canSubmit = usernameStatus === 'available' && !isPending
 
   return {
     username,
     setUsername,
     usernameStatus,
-    isPending: registerMutation.isPending,
-    error: registerMutation.error?.message ?? null,
+    isPending,
+    error: error?.message ?? null,
     canSubmit,
     register: (e: FormEvent) => {
       e.preventDefault()
       if (!canSubmit) return
-      registerMutation.mutate()
+      mutate()
     },
   } as const
 }
