@@ -15,6 +15,8 @@ export const { getAuthUser } = authComponent.clientApi()
 export const createAuth = (ctx: Parameters<typeof convexAdapter>[0]) => {
   return betterAuth({
     database: convexAdapter(ctx, components.betterAuth),
+    baseURL: process.env.SITE_URL ?? 'http://localhost:3000',
+    trustedOrigins: [process.env.SITE_URL ?? 'http://localhost:3000'],
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: false,

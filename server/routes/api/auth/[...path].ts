@@ -4,7 +4,9 @@ export default async (event: any) => {
     return new Response('VITE_CONVEX_SITE_URL not configured', { status: 500 })
   }
 
-  const request: Request = event.request || event
+  // H3Event stores the underlying Web Request at event.req
+  const request: Request = event.req
+
   const requestUrl = new URL(request.url)
   const nextUrl = `${convexSiteUrl}${requestUrl.pathname}${requestUrl.search}`
   const headers = new Headers(request.headers)
