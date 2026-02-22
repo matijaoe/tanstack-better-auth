@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "skills": {
+    "better-auth-best-practices": {
+      "source": "better-auth/skills",
+      "sourceType": "github",
+      "computedHash": "a24359053259e55a75972cab4bf0b0e37e1393bac5f3756ec2e3a7b4b3778d2a"
+    },
+    "better-auth-security-best-practices": {
+      "source": "better-auth/skills",
+      "sourceType": "github",
+      "computedHash": "294d13881e083d41ff874b1da6689faf0c9eee4120579c0148a7a9c2aaa83e0c"
+    },
+    "convex": {
+      "source": "waynesutton/convexskills",
+      "sourceType": "github",
+      "computedHash": "de7a20d081cd19bf8bce4038bd62d038a0a88f218f85afb35320d09b052fb534"
+    },
+    "convex-agents": {
+      "source": "waynesutton/convexskills",
+      "sourceType": "github",
+      "computedHash": "3054123dedc1b7ded9b6404c6c641023683fe509103fe7dc148acda831d53d36"
+    },
+    "convex-best-practices": {
+      "source": "waynesutton/convexskills",
+      "sourceType": "github",
+      "computedHash": "3b24d2afbb5859e3a3640c1e47e2ac9ace81e9737ec76b891951999361c92ab1"
+    },
+    "convex-component-authoring": {
+      "source": "waynesutton/convexskills",
+      "sourceType": "github",
+      "computedHash": "dbb84d8c1996d9054958f07e67502ece523c49ff957bb3109397a6595e44f4ed"
+    },
+    "convex-functions": {
+      "source": "waynesutton/convexskills",
+      "sourceType": "github",
+      "computedHash": "a08fd9695ad0558ec12a312136d6a1483df04fcb5548207a99ce7d14c0df251a"
+    },
+    "convex-http-actions": {
+      "source": "waynesutton/convexskills",
+      "sourceType": "github",
+      "computedHash": "c189703dd5d91f280b53d6bd903bf8313e935b1edab136bb7ffdb6c1512b95aa"
+    },
+    "convex-realtime": {
+      "source": "waynesutton/convexskills",
+      "sourceType": "github",
+      "computedHash": "aa08a2856778c09aa8c0f5eef431fc102115e04461d7d3f86e6ce97b5848b52f"
+    },
+    "convex-schema-validator": {
+      "source": "waynesutton/convexskills",
+      "sourceType": "github",
+      "computedHash": "97b7965f2bc665f1848196813c79e32bff2d8b58b3a701b313c4a96f0bf5ac95"
+    },
+    "convex-security-audit": {
+      "source": "waynesutton/convexskills",
+      "sourceType": "github",
+      "computedHash": "a1468190e59af7e8a8352dd6d3707f0b5a19659e3f4503042c6be0a91cbb3916"
+    },
+    "convex-security-check": {
+      "source": "waynesutton/convexskills",
+      "sourceType": "github",
+      "computedHash": "b53e061304bb81d037c6dd4e38762d27a596523bcbeab43c58e0b05140449802"
+    },
+    "email-and-password-best-practices": {
+      "source": "better-auth/skills",
+      "sourceType": "github",
+      "computedHash": "9105cc29a462e8d07da45bbdbc90c3a60be3ba32fbd9d99d49944f5b971f8f96"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "computedHash": "063a0e6448123cd359ad0044cc46b0e490cc7964d45ef4bb9fd842bd2ffbca67"
+    },
+    "organization-best-practices": {
+      "source": "better-auth/skills",
+      "sourceType": "github",
+      "computedHash": "ec7bfca730d9263a357bfb059448035e62339ee58eb6191dfe9029088ed5bdf2"
+    },
+    "tanstack-start-best-practices": {
+      "source": "deckardger/tanstack-agent-skills",
+      "sourceType": "github",
+      "computedHash": "50c1b6d9b35b05927fa0c81962d560634385c9567b7b1d66396b171965b33105"
+    },
+    "two-factor-authentication-best-practices": {
+      "source": "better-auth/skills",
+      "sourceType": "github",
+      "computedHash": "37c04cd3de40b33601f2d2dfb290bde6dcc873badbdeace7d2a0e73dd055b270"
+    },
+    "vercel-react-best-practices": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "4365be772fd3b41994a72ad478472c6d680678e7f3859860ab010e9c46e48ee0"
+    },
+    "zod": {
+      "source": "pproenca/dot-skills",
+      "sourceType": "github",
+      "computedHash": "e5d8e35002d0d6b03db0b0daad54e1b82c9c10804f8a745025c07db5ea685655"
+    }
+  }
+}
