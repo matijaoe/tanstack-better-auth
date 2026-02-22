@@ -20,5 +20,5 @@ export function usePasskeyLogin() {
     login: () => mutate(),
     isPending,
     error: error?.message ?? null,
-  } as const
+  }
 }

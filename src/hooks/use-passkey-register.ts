@@ -82,5 +82,5 @@ export function usePasskeyRegister() {
       if (!canSubmit) return
       mutate()
     },
-  } as const
+  }
 }

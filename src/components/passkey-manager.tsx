@@ -28,7 +28,7 @@ export function PasskeyManager() {
   }
 
   const commitRename = async (id: string) => {
-    await rename(id, editName)
+    rename(id, editName)
     setEditingId(null)
     setEditName('')
   }

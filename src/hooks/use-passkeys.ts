@@ -53,5 +53,5 @@ export function usePasskeys() {
     add: () => addMutation.mutate(),
     rename: (id: string, name: string) => renameMutation.mutate({ id, name }),
     remove: (id: string) => removeMutation.mutate(id),
-  } as const
+  }
 }
