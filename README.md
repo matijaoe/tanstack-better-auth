@@ -2,6 +2,8 @@
 
 A demo app showcasing passwordless authentication with passkeys, built on a modern full-stack TypeScript setup.
 
+<img width="3010" height="1754" src="https://github.com/user-attachments/assets/ba0b0308-5ad5-422c-be90-2ae8a30103da" />
+
 ## Stack
 
 - **[TanStack Start](https://tanstack.com/start)** — full-stack React framework with SSR and file-based routing
