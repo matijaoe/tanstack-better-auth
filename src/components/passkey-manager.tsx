@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
 
 import {
   AlertDialog,
@@ -15,75 +15,22 @@ import { Button } from '#/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#/components/ui/card'
 import { Input } from '#/components/ui/input'
 import { Skeleton } from '#/components/ui/skeleton'
-import { authClient } from '#/lib/auth-client'
-
-type Passkey = {
-  id: string
-  name?: string | null
-  createdAt: Date
-}
+import { usePasskeys, type Passkey } from '#/hooks/use-passkeys'
 
 export function PasskeyManager() {
-  const [passkeys, setPasskeys] = useState<Passkey[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const { passkeys, isLoading, isAdding, add, rename, remove } = usePasskeys()
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editName, setEditName] = useState('')
-  const [isAdding, setIsAdding] = useState(false)
-
-  const fetchPasskeys = useCallback(async () => {
-    try {
-      const result = await authClient.passkey.listUserPasskeys()
-      if (result.data) {
-        setPasskeys(result.data)
-      }
-    } catch {
-      // ignore fetch errors
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    fetchPasskeys()
-  }, [fetchPasskeys])
-
-  const handleAdd = async () => {
-    setIsAdding(true)
-    try {
-      await authClient.passkey.addPasskey({ name: 'New passkey' })
-      await fetchPasskeys()
-    } catch {
-      // user cancelled or error
-    } finally {
-      setIsAdding(false)
-    }
-  }
-
-  const handleRename = async (id: string) => {
-    if (!editName.trim()) return
-    try {
-      await authClient.passkey.updatePasskey({ id, name: editName.trim() })
-      await fetchPasskeys()
-    } catch {
-      // ignore
-    } finally {
-      setEditingId(null)
-      setEditName('')
-    }
-  }
-
-  const handleDelete = async (id: string) => {
-    try {
-      await authClient.passkey.deletePasskey({ id })
-      await fetchPasskeys()
-    } catch {
-      // ignore
-    }
-  }
 
   const startEditing = (passkey: Passkey) => {
     setEditingId(passkey.id)
     setEditName(passkey.name ?? '')
+  }
+
+  const commitRename = async (id: string) => {
+    await rename(id, editName)
+    setEditingId(null)
+    setEditName('')
   }
 
   if (isLoading) {
@@ -110,7 +57,7 @@ export function PasskeyManager() {
           <CardTitle className="text-xl">Passkeys</CardTitle>
           <CardDescription>Manage your passkeys for authentication</CardDescription>
         </div>
-        <Button onClick={handleAdd} disabled={isAdding} size="sm">
+        <Button onClick={add} disabled={isAdding} size="sm">
           {isAdding ? 'Adding...' : 'Add passkey'}
         </Button>
       </CardHeader>
@@ -130,9 +77,9 @@ export function PasskeyManager() {
                 <Input
                   value={editName}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditName(e.target.value)}
-                  onBlur={() => handleRename(passkey.id)}
+                  onBlur={() => commitRename(passkey.id)}
                   onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                    if (e.key === 'Enter') handleRename(passkey.id)
+                    if (e.key === 'Enter') commitRename(passkey.id)
                     if (e.key === 'Escape') {
                       setEditingId(null)
                       setEditName('')
@@ -154,59 +101,34 @@ export function PasskeyManager() {
               </p>
             </div>
             <div className="ml-4">
-              {isLastPasskey ? (
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="ghost" size="sm" className="text-destructive-foreground">
-                      Delete
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Delete last passkey?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This is your only passkey. Deleting it will make your account inaccessible.
-                        You won&apos;t be able to sign in again.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={() => handleDelete(passkey.id)}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                      >
-                        Delete anyway
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              ) : (
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="ghost" size="sm" className="text-destructive-foreground">
-                      Delete
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Delete passkey?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Are you sure you want to delete &quot;{passkey.name ?? 'Unnamed passkey'}
-                        &quot;? This action cannot be undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={() => handleDelete(passkey.id)}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                      >
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              )}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-destructive-foreground">
+                    Delete
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      {isLastPasskey ? 'Delete last passkey?' : 'Delete passkey?'}
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {isLastPasskey
+                        ? "This is your only passkey. Deleting it will make your account inaccessible. You won't be able to sign in again."
+                        : `Are you sure you want to delete "${passkey.name ?? 'Unnamed passkey'}"? This action cannot be undone.`}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => remove(passkey.id)}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      {isLastPasskey ? 'Delete anyway' : 'Delete'}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         ))}

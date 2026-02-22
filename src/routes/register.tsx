@@ -1,5 +1,4 @@
-import { createFileRoute, redirect, Link, useNavigate } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
+import { createFileRoute, redirect, Link } from '@tanstack/react-router'
 
 import { Button } from '#/components/ui/button'
 import {
@@ -12,7 +11,7 @@ import {
 } from '#/components/ui/card'
 import { Input } from '#/components/ui/input'
 import { Label } from '#/components/ui/label'
-import { authClient } from '#/lib/auth-client'
+import { usePasskeyRegister } from '#/hooks/use-passkey-register'
 
 export const Route = createFileRoute('/register')({
   beforeLoad: ({ context }) => {
@@ -24,67 +23,8 @@ export const Route = createFileRoute('/register')({
 })
 
 function RegisterPage() {
-  const navigate = useNavigate()
-  const [username, setUsername] = useState('')
-  const [isAvailable, setIsAvailable] = useState<boolean | null>(null)
-  const [isCheckingAvailability, setIsCheckingAvailability] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-
-  useEffect(() => {
-    if (username.length < 3) {
-      setIsAvailable(null)
-      return
-    }
-
-    const timeout = setTimeout(async () => {
-      setIsCheckingAvailability(true)
-      try {
-        const result = await authClient.isUsernameAvailable({ username })
-        setIsAvailable(result.data?.available ?? false)
-      } catch {
-        setIsAvailable(null)
-      } finally {
-        setIsCheckingAvailability(false)
-      }
-    }, 300)
-
-    return () => clearTimeout(timeout)
-  }, [username])
-
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!isAvailable || username.length < 3) return
-
-    setError(null)
-    setIsLoading(true)
-
-    try {
-      const email = `${username}@passkey.internal`
-      const password = crypto.randomUUID()
-
-      const signUpResult = await authClient.signUp.email({
-        email,
-        password,
-        name: username,
-        username,
-      })
-
-      if (signUpResult.error) {
-        setError(signUpResult.error.message ?? 'Registration failed.')
-        setIsLoading(false)
-        return
-      }
-
-      await authClient.passkey.addPasskey({ name: 'My first passkey' })
-
-      navigate({ to: '/profile' })
-    } catch {
-      setError('Registration failed. Please try again.')
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const { username, setUsername, usernameStatus, isPending, error, canSubmit, register } =
+    usePasskeyRegister()
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
@@ -93,7 +33,7 @@ function RegisterPage() {
           <CardTitle className="text-2xl">Create your account</CardTitle>
           <CardDescription>Choose a username and set up your passkey</CardDescription>
         </CardHeader>
-        <form onSubmit={handleRegister}>
+        <form onSubmit={register}>
           <CardContent className="space-y-4">
             {error && (
               <div className="border-destructive/50 bg-destructive/10 text-destructive-foreground rounded-lg border p-3 text-sm">
@@ -107,7 +47,7 @@ function RegisterPage() {
                 placeholder="Choose a username"
                 value={username}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
-                disabled={isLoading}
+                disabled={isPending}
                 autoComplete="username"
               />
               {username.length > 0 && username.length < 3 && (
@@ -115,23 +55,18 @@ function RegisterPage() {
                   Username must be at least 3 characters
                 </p>
               )}
-              {isCheckingAvailability && (
+              {usernameStatus === 'checking' && (
                 <p className="text-muted-foreground text-xs">Checking availability...</p>
               )}
-              {!isCheckingAvailability && isAvailable === true && (
+              {usernameStatus === 'available' && (
                 <p className="text-xs text-green-500">Username is available</p>
               )}
-              {!isCheckingAvailability && isAvailable === false && (
+              {usernameStatus === 'taken' && (
                 <p className="text-destructive-foreground text-xs">Username is taken</p>
               )}
             </div>
-            <Button
-              type="submit"
-              disabled={isLoading || !isAvailable || username.length < 3}
-              className="w-full"
-              size="lg"
-            >
-              {isLoading ? 'Setting up...' : 'Register with Passkey'}
+            <Button type="submit" disabled={!canSubmit} className="w-full" size="lg">
+              {isPending ? 'Setting up...' : 'Register with Passkey'}
             </Button>
           </CardContent>
         </form>

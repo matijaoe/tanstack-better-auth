@@ -1,5 +1,4 @@
-import { createFileRoute, redirect, Link, useNavigate } from '@tanstack/react-router'
-import { useState } from 'react'
+import { createFileRoute, redirect, Link } from '@tanstack/react-router'
 
 import { Button } from '#/components/ui/button'
 import {
@@ -10,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '#/components/ui/card'
-import { authClient } from '#/lib/auth-client'
+import { usePasskeyLogin } from '#/hooks/use-passkey-login'
 
 export const Route = createFileRoute('/login')({
   beforeLoad: ({ context }) => {
@@ -22,26 +21,7 @@ export const Route = createFileRoute('/login')({
 })
 
 function LoginPage() {
-  const navigate = useNavigate()
-  const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-
-  const handlePasskeySignIn = async () => {
-    setError(null)
-    setIsLoading(true)
-    try {
-      const result = await authClient.signIn.passkey()
-      if (result?.error) {
-        setError(result.error.message ?? 'Passkey authentication failed.')
-      } else {
-        navigate({ to: '/profile' })
-      }
-    } catch {
-      setError('Passkey authentication was cancelled or failed.')
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const { login, isPending, error } = usePasskeyLogin()
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
@@ -56,8 +36,8 @@ function LoginPage() {
               {error}
             </div>
           )}
-          <Button onClick={handlePasskeySignIn} disabled={isLoading} className="w-full" size="lg">
-            {isLoading ? 'Authenticating...' : 'Sign in with Passkey'}
+          <Button onClick={login} disabled={isPending} className="w-full" size="lg">
+            {isPending ? 'Authenticating...' : 'Sign in with Passkey'}
           </Button>
         </CardContent>
         <CardFooter className="justify-center">

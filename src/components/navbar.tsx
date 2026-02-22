@@ -1,16 +1,13 @@
 import { Link, useRouteContext } from '@tanstack/react-router'
 
 import { Button } from '#/components/ui/button'
+import { useLogout } from '#/hooks/use-logout'
 import { authClient } from '#/lib/auth-client'
 
 export function Navbar() {
   const { isAuthenticated } = useRouteContext({ from: '__root__' })
   const { data: session } = authClient.useSession()
-
-  const handleSignOut = async () => {
-    await authClient.signOut()
-    window.location.reload()
-  }
+  const logout = useLogout()
 
   return (
     <header className="border-border bg-card border-b">
@@ -25,7 +22,7 @@ export function Navbar() {
                 {((session.user as Record<string, unknown>).username as string) ??
                   session.user.name}
               </span>
-              <Button variant="ghost" size="sm" onClick={handleSignOut}>
+              <Button variant="ghost" size="sm" onClick={logout}>
                 Sign out
               </Button>
             </>
