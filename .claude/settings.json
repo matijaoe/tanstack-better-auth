@@ -76,10 +76,7 @@
       "Bash(yarn workspace:*)",
       "WebFetch(domain:formulae.brew.sh)"
     ],
-    "deny": [
-      "Bash(rm -rf:*)",
-      "Bash(sudo:*)"
-    ],
+    "deny": ["Bash(rm -rf:*)", "Bash(sudo:*)"],
     "ask": [
       "Bash(git branch -d *)",
       "Bash(git branch -D *)",
@@ -107,6 +104,19 @@
     "code-simplifier@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path' | xargs oxfmt --write"
+          }
+        ]
+      }
+    ]
   },
   "skipDangerousModePermissionPrompt": true,
   "showTurnDuration": true,
