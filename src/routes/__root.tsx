@@ -25,7 +25,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     meta: [
       { charSet: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'Passkey Auth' },
+      { title: 'Passkey' },
     ],
     links: [{ rel: 'stylesheet', href: appCss }],
   }),
@@ -62,10 +62,16 @@ function RootComponent() {
       authClient={authClient}
       initialToken={token}
     >
-      <div className="bg-background text-foreground min-h-screen">
+      <div className="page-grid-bg text-foreground min-h-screen">
         <Navbar />
-        <main className="container mx-auto max-w-2xl px-4 py-8">
-          <Outlet />
+        <main className="container mx-auto max-w-2xl px-4 py-12">
+          <div className="crosshair-container">
+            <span className="corner-marker corner-marker--tl" aria-hidden="true" />
+            <span className="corner-marker corner-marker--tr" aria-hidden="true" />
+            <span className="corner-marker corner-marker--bl" aria-hidden="true" />
+            <span className="corner-marker corner-marker--br" aria-hidden="true" />
+            <Outlet />
+          </div>
         </main>
       </div>
     </ConvexBetterAuthProvider>

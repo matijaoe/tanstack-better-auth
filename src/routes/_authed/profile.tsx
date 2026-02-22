@@ -2,7 +2,6 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { PasskeyManager } from '#/components/passkey-manager'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#/components/ui/card'
-import { Separator } from '#/components/ui/separator'
 import { Skeleton } from '#/components/ui/skeleton'
 import { authClient } from '#/lib/auth-client'
 
@@ -34,9 +33,14 @@ function ProfilePage() {
 
   return (
     <div className="space-y-6">
+      <div className="border-border border-b pb-4">
+        <h1 className="font-mono text-xs font-semibold tracking-widest uppercase text-muted-foreground">
+          Profile
+        </h1>
+      </div>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Profile</CardTitle>
+          <CardTitle className="text-lg">Account</CardTitle>
           <CardDescription>Your account information</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -54,8 +58,6 @@ function ProfilePage() {
           </div>
         </CardContent>
       </Card>
-
-      <Separator />
 
       <PasskeyManager />
     </div>
