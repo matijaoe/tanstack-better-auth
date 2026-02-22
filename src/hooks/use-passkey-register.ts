@@ -54,6 +54,7 @@ export function usePasskeyRegister() {
 
         if (signUpResult.error) {
           setError(signUpResult.error.message ?? 'Registration failed.')
+          setIsPending(false)
           return
         }
 
@@ -67,7 +68,6 @@ export function usePasskeyRegister() {
         navigate({ to: '/profile' })
       } catch {
         setError('Registration failed. Please try again.')
-      } finally {
         setIsPending(false)
       }
     },

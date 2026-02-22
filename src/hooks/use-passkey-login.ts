@@ -15,12 +15,12 @@ export function usePasskeyLogin() {
       const result = await authClient.signIn.passkey()
       if (result?.error) {
         setError(result.error.message ?? 'Passkey authentication failed.')
+        setIsPending(false)
       } else {
         navigate({ to: '/profile' })
       }
     } catch {
       setError('Passkey authentication was cancelled or failed.')
-    } finally {
       setIsPending(false)
     }
   }, [navigate])
