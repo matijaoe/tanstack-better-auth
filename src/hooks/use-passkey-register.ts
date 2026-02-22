@@ -1,78 +1,86 @@
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import { useCallback, useEffect, useState } from 'react'
+import { type FormEvent, useState } from 'react'
 
 import { authClient } from '#/lib/auth-client'
+
+import { useDebouncedValue } from './use-debounced-value'
 
 type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'error'
 
 export function usePasskeyRegister() {
   const navigate = useNavigate()
   const [username, setUsername] = useState('')
-  const [usernameStatus, setUsernameStatus] = useState<UsernameStatus>('idle')
-  const [isPending, setIsPending] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const debouncedUsername = useDebouncedValue(username, 300)
 
-  useEffect(() => {
+  const availabilityQuery = useQuery({
+    queryKey: ['username-availability', debouncedUsername],
+    queryFn: async () => {
+      const result = await authClient.isUsernameAvailable({
+        username: debouncedUsername,
+      })
+      return result.data?.available ?? false
+    },
+    enabled: debouncedUsername.length >= 3,
+  })
+
+  function getUsernameStatus(): UsernameStatus {
     if (username.length < 3) {
-      setUsernameStatus('idle')
-      return
+      return 'idle'
     }
+    if (username !== debouncedUsername || availabilityQuery.isFetching) {
+      return 'checking'
+    }
+    if (availabilityQuery.isError) {
+      return 'error'
+    }
+    return availabilityQuery.data ? 'available' : 'taken'
+  }
 
-    setUsernameStatus('checking')
-    const timeout = setTimeout(async () => {
-      try {
-        const result = await authClient.isUsernameAvailable({ username })
-        setUsernameStatus(result.data?.available ? 'available' : 'taken')
-      } catch {
-        setUsernameStatus('error')
+  const usernameStatus = getUsernameStatus()
+
+  const registerMutation = useMutation({
+    mutationFn: async () => {
+      // TODO: not great. use actual email + password in the future, or wait for passkey supported not requiring these fields
+      const email = `${username}@passkey.internal`
+      const password = crypto.randomUUID()
+
+      const signUpResult = await authClient.signUp.email({
+        email,
+        password,
+        name: username,
+        username,
+      })
+
+      if (signUpResult.error) {
+        throw new Error(signUpResult.error.message ?? 'Registration failed.')
       }
-    }, 300)
-
-    return () => clearTimeout(timeout)
-  }, [username])
-
-  const canSubmit = usernameStatus === 'available' && !isPending
-
-  const register = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault()
-      if (!canSubmit) return
-
-      setError(null)
-      setIsPending(true)
 
       try {
-        const email = `${username}@passkey.internal`
-        const password = crypto.randomUUID()
-
-        const signUpResult = await authClient.signUp.email({
-          email,
-          password,
-          name: username,
-          username,
-        })
-
-        if (signUpResult.error) {
-          setError(signUpResult.error.message ?? 'Registration failed.')
-          setIsPending(false)
-          return
-        }
-
-        try {
-          await authClient.passkey.addPasskey({ name: 'My first passkey' })
-        } catch {
-          setError('Account created but passkey setup failed. Try adding a passkey from your profile.')
-          navigate({ to: '/profile' })
-          return
-        }
-        navigate({ to: '/profile' })
+        await authClient.passkey.addPasskey({ name: 'My first passkey' })
       } catch {
-        setError('Registration failed. Please try again.')
-        setIsPending(false)
+        navigate({ to: '/profile' })
+        throw new Error(
+          'Account created but passkey setup failed. Try adding a passkey from your profile.',
+        )
       }
     },
-    [canSubmit, username, navigate],
-  )
+    onSuccess: () => navigate({ to: '/profile' }),
+  })
 
-  return { username, setUsername, usernameStatus, isPending, error, canSubmit, register } as const
+  const canSubmit = usernameStatus === 'available' && !registerMutation.isPending
+
+  return {
+    username,
+    setUsername,
+    usernameStatus,
+    isPending: registerMutation.isPending,
+    error: registerMutation.error?.message ?? null,
+    canSubmit,
+    register: (e: FormEvent) => {
+      e.preventDefault()
+      if (!canSubmit) return
+      registerMutation.mutate()
+    },
+  } as const
 }

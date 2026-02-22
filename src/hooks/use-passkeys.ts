@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { authClient } from '#/lib/auth-client'
 
@@ -9,67 +9,49 @@ export type Passkey = {
 }
 
 export function usePasskeys() {
-  const [passkeys, setPasskeys] = useState<Passkey[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [isAdding, setIsAdding] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const queryClient = useQueryClient()
 
-  const refetch = useCallback(async () => {
-    try {
+  const passkeysQuery = useQuery({
+    queryKey: ['passkeys'],
+    queryFn: async () => {
       const result = await authClient.passkey.listUserPasskeys()
-      if (result.data) {
-        setPasskeys(result.data)
-      }
-    } catch {
-      // ignore fetch errors
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    refetch()
-  }, [refetch])
-
-  const add = useCallback(async () => {
-    setIsAdding(true)
-    setError(null)
-    try {
-      await authClient.passkey.addPasskey({ name: 'New passkey' })
-      await refetch()
-    } catch {
-      // user cancelled the WebAuthn dialog — not an error worth surfacing
-    } finally {
-      setIsAdding(false)
-    }
-  }, [refetch])
-
-  const rename = useCallback(
-    async (id: string, name: string) => {
-      if (!name.trim()) return
-      setError(null)
-      try {
-        await authClient.passkey.updatePasskey({ id, name: name.trim() })
-        await refetch()
-      } catch {
-        setError('Failed to rename passkey.')
-      }
+      return (result.data ?? []) as Passkey[]
     },
-    [refetch],
-  )
+  })
 
-  const remove = useCallback(
-    async (id: string) => {
-      setError(null)
-      try {
-        await authClient.passkey.deletePasskey({ id })
-        await refetch()
-      } catch {
-        setError('Failed to delete passkey.')
-      }
+  const invalidatePasskeys = () =>
+    queryClient.invalidateQueries({ queryKey: ['passkeys'] })
+
+  const addMutation = useMutation({
+    mutationFn: () => authClient.passkey.addPasskey({ name: 'New passkey' }),
+    onSuccess: invalidatePasskeys,
+  })
+
+  const renameMutation = useMutation({
+    mutationFn: ({ id, name }: { id: string; name: string }) => {
+      if (!name.trim()) return Promise.resolve()
+      return authClient.passkey.updatePasskey({ id, name: name.trim() })
     },
-    [refetch],
-  )
+    onSuccess: invalidatePasskeys,
+  })
 
-  return { passkeys, isLoading, isAdding, error, add, rename, remove } as const
+  const removeMutation = useMutation({
+    mutationFn: (id: string) => authClient.passkey.deletePasskey({ id }),
+    onSuccess: invalidatePasskeys,
+  })
+
+  const error =
+    renameMutation.error?.message ??
+    removeMutation.error?.message ??
+    (passkeysQuery.error ? 'Failed to load passkeys.' : null)
+
+  return {
+    passkeys: passkeysQuery.data ?? [],
+    isLoading: passkeysQuery.isLoading,
+    isAdding: addMutation.isPending,
+    error,
+    add: () => addMutation.mutate(),
+    rename: (id: string, name: string) => renameMutation.mutate({ id, name }),
+    remove: (id: string) => removeMutation.mutate(id),
+  } as const
 }
