@@ -19,8 +19,7 @@ export function Navbar() {
           {isAuthenticated && session?.user ? (
             <>
               <span className="text-muted-foreground text-sm">
-                {((session.user as Record<string, unknown>).username as string) ??
-                  session.user.name}
+                {(session.user as { username?: string }).username ?? session.user.name}
               </span>
               <Button variant="ghost" size="sm" onClick={logout}>
                 Sign out

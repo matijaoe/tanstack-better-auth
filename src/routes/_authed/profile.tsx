@@ -43,7 +43,7 @@ function ProfilePage() {
           <div className="flex justify-between">
             <span className="text-muted-foreground">Username</span>
             <span className="font-medium">
-              {((user as Record<string, unknown>)?.username as string) ?? user?.name ?? 'Unknown'}
+              {(user as { username?: string })?.username ?? user?.name ?? 'Unknown'}
             </span>
           </div>
           <div className="flex justify-between">

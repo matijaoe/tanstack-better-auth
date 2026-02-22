@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { authClient } from '#/lib/auth-client'
 
-type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken'
+type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'error'
 
 export function usePasskeyRegister() {
   const navigate = useNavigate()
@@ -24,7 +24,7 @@ export function usePasskeyRegister() {
         const result = await authClient.isUsernameAvailable({ username })
         setUsernameStatus(result.data?.available ? 'available' : 'taken')
       } catch {
-        setUsernameStatus('idle')
+        setUsernameStatus('error')
       }
     }, 300)
 
@@ -57,7 +57,13 @@ export function usePasskeyRegister() {
           return
         }
 
-        await authClient.passkey.addPasskey({ name: 'My first passkey' })
+        try {
+          await authClient.passkey.addPasskey({ name: 'My first passkey' })
+        } catch {
+          setError('Account created but passkey setup failed. Try adding a passkey from your profile.')
+          navigate({ to: '/profile' })
+          return
+        }
         navigate({ to: '/profile' })
       } catch {
         setError('Registration failed. Please try again.')

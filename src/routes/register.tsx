@@ -64,6 +64,11 @@ function RegisterPage() {
               {usernameStatus === 'taken' && (
                 <p className="text-destructive-foreground text-xs">Username is taken</p>
               )}
+              {usernameStatus === 'error' && (
+                <p className="text-destructive-foreground text-xs">
+                  Could not check availability. Try again.
+                </p>
+              )}
             </div>
             <Button type="submit" disabled={!canSubmit} className="w-full" size="lg">
               {isPending ? 'Setting up...' : 'Register with Passkey'}

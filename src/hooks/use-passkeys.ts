@@ -12,6 +12,7 @@ export function usePasskeys() {
   const [passkeys, setPasskeys] = useState<Passkey[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isAdding, setIsAdding] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const refetch = useCallback(async () => {
     try {
@@ -32,11 +33,12 @@ export function usePasskeys() {
 
   const add = useCallback(async () => {
     setIsAdding(true)
+    setError(null)
     try {
       await authClient.passkey.addPasskey({ name: 'New passkey' })
       await refetch()
     } catch {
-      // user cancelled or error
+      // user cancelled the WebAuthn dialog — not an error worth surfacing
     } finally {
       setIsAdding(false)
     }
@@ -45,11 +47,12 @@ export function usePasskeys() {
   const rename = useCallback(
     async (id: string, name: string) => {
       if (!name.trim()) return
+      setError(null)
       try {
         await authClient.passkey.updatePasskey({ id, name: name.trim() })
         await refetch()
       } catch {
-        // ignore
+        setError('Failed to rename passkey.')
       }
     },
     [refetch],
@@ -57,15 +60,16 @@ export function usePasskeys() {
 
   const remove = useCallback(
     async (id: string) => {
+      setError(null)
       try {
         await authClient.passkey.deletePasskey({ id })
         await refetch()
       } catch {
-        // ignore
+        setError('Failed to delete passkey.')
       }
     },
     [refetch],
   )
 
-  return { passkeys, isLoading, isAdding, add, rename, remove } as const
+  return { passkeys, isLoading, isAdding, error, add, rename, remove } as const
 }

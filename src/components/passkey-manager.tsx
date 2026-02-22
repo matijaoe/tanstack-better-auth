@@ -18,7 +18,7 @@ import { Skeleton } from '#/components/ui/skeleton'
 import { usePasskeys, type Passkey } from '#/hooks/use-passkeys'
 
 export function PasskeyManager() {
-  const { passkeys, isLoading, isAdding, add, rename, remove } = usePasskeys()
+  const { passkeys, isLoading, isAdding, error, add, rename, remove } = usePasskeys()
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editName, setEditName] = useState('')
 
@@ -62,6 +62,11 @@ export function PasskeyManager() {
         </Button>
       </CardHeader>
       <CardContent className="space-y-3">
+        {error && (
+          <div className="border-destructive/50 bg-destructive/10 text-destructive-foreground rounded-lg border p-3 text-sm">
+            {error}
+          </div>
+        )}
         {passkeys.length === 0 && (
           <p className="text-muted-foreground py-4 text-center text-sm">
             No passkeys registered. Add one to secure your account.

@@ -6,7 +6,7 @@ import { createServerFn } from '@tanstack/react-start'
 
 import { Navbar } from '#/components/navbar'
 import { authClient } from '#/lib/auth-client'
-import { getToken } from '#/lib/auth-server'
+import { getToken } from '#/lib/auth.server'
 
 import appCss from '../styles.css?url'
 
